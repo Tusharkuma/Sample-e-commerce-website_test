@@ -13,7 +13,13 @@ const ShopBy = ({ filter, title }) => {
             try {
                 const res = await axios.get(`${import.meta.env.VITE_BASE_URL}/api/filter/${filter}`);
                 if (isMounted) {
-                    setProducts(res.data);
+                    const payload = res.data;
+                    const normalizedProducts = Array.isArray(payload)
+                        ? payload
+                        : Array.isArray(payload.products)
+                            ? payload.products
+                            : [];
+                    setProducts(normalizedProducts);
                     setLoading(false);
                 }
             } catch (err) {
@@ -29,7 +35,9 @@ const ShopBy = ({ filter, title }) => {
         return () => {
             isMounted = false;
         }
-    }, [])
+    }, [filter])
+
+    const productList = Array.isArray(products) ? products : [];
 
     return (
         <>
@@ -37,8 +45,9 @@ const ShopBy = ({ filter, title }) => {
             <div className='overflow-x-auto overflow-y-hidden md:max-w-full scroll-container mb-10 mx-auto relative scroll-container'>
                 {loading && <p>Loading...</p>}
                 {error && <p>Error while fetching: {error.message}</p>}
+                {!loading && !error && productList.length === 0 && <p>No products found.</p>}
                 <div className='flex flex-nowrap space-x-4 '>
-                    {products.map(elem => (
+                    {productList.map(elem => (
                         <HorSlider product={elem} key={elem._id} className="inline-block" home={true} />
                     ))}
                 </div>
