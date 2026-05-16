@@ -1,0 +1,1 @@
+# Create .env files in both folder and copy sample.env content to it.
